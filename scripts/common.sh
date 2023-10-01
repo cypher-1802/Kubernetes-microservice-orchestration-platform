@@ -16,6 +16,7 @@ sudo swapoff -a
 sudo apt-get update -y
 sudo apt upgrade -y
 sudo apt install curl
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 4D64390375060AA4
 
 
 # Install CRI-O Runtime
@@ -73,7 +74,7 @@ sudo apt-get install --allow-downgrades -y kubelet="$KUBERNETES_VERSION" kubectl
 sudo apt-get update -y
 sudo apt-get install -y jq
 
-sudo apt upgrade
+sudo apt upgrade -y
 
 local_ip="$(ip --json addr show enp0s3 | jq -r '.[0].addr_info[] | select(.family == "inet") | .local')"
 echo "Local IP Address : $local_ip"
