@@ -77,8 +77,8 @@ sudo apt-get install -y jq
 sudo apt upgrade -y
 
 # local_ip="$(ip --json addr show eth0 | jq -r '.[0].addr_info[] | select(.family == "inet") | .local')"
-# echo "Local IP Address : $local_ip"
 local_ip="$(curl ifconfig.me)"
+echo "Local IP Address : $local_ip"
 sudo sh -c "cat > /etc/default/kubelet << EOF
 KUBELET_EXTRA_ARGS=--node-ip=$local_ip
 EOF"
