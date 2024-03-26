@@ -1,0 +1,1 @@
+sudo microk8s kubectl get po -o custom-columns="NODE-NAME":.spec.nodeName,"POD-ID":.status.podIP --no-headers | grep node1 | awk '{print $2}'

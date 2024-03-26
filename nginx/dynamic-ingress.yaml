@@ -1,0 +1,60 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-rules
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      set_by_lua_block $node {
+        local url = ngx.var.request_uri
+        local path, node = url:match("^(.*)/([^/]+)$")
+
+        local ip_file = assert(io.open("ip","r"))
+        local ns_file = assert(io.open("ns","r"))
+
+        local ip
+        local ns
+
+        -- Read IP file
+        for line in ip_file:lines() do
+          local name, value = line:match("(%S+)%s+(%S+)")
+          if name == node then
+            ip = value
+            break
+          end
+        end
+        ip_file:close()
+
+        -- Read namespace file
+        for line in ns_file:lines() do
+          local name, value = line:match("(%S+)%s+(%S+)")
+          if name == node then
+            ns = value
+            break
+          end
+        end
+        ns_file:close()
+
+        if ip and ns then
+          ngx.log(ngx.INFO, "Node IP:", ip)
+          ngx.log(ngx.INFO, "Node Namespace:", ns)
+          return ip, ns, path
+        else
+          ngx.exit(ngx.HTTP_NOT_FOUND)
+        end
+
+      }
+    nginx.ingress.kubernetes.io/upstream-vhost: '$node[1].$node[2].pod.cluster.local/$node[3]'
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: testing.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: svc
+            port:
+              number: 80

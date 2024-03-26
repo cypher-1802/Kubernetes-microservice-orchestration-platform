@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ip-dictionary
+data:
+  master: 10-1-219-97
+  node1: 10-1-166-158
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: namespace-dictionary
+data:
+  master: default
+  node1: default
